@@ -1,0 +1,16 @@
+{
+  "name": "com.hlight.serialization",
+  "version": "1.0.0",
+  "displayName": "Hlight Serialization",
+  "description": "ScriptableObject serializer assets with JsonUtility, Newtonsoft.Json, Odin and primitive-cast backends behind one interface.",
+  "unity": "6000.0",
+  "keywords": [
+    "serialization",
+    "json",
+    "newtonsoft",
+    "odin"
+  ],
+  "author": {
+    "name": "Hlight"
+  }
+}
