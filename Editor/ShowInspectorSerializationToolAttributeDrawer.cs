@@ -62,9 +62,11 @@ namespace Hlight.Serialization.InspectorSerializationTool.Editor
             EditorGUI.indentLevel--;
         }
 
+        // boxedValue reads the property itself; fieldInfo.GetValue(targetObject) only works for a
+        // field declared directly on the asset, not one nested inside a [Serializable] class.
         private void Serialize(SerializedProperty property)
         {
-            var value = fieldInfo.GetValue(property.serializedObject.targetObject);
+            var value = property.boxedValue;
             _text = _serializer ? _serializer.Serialize(value) : JsonUtility.ToJson(value);
             EditorGUIUtility.systemCopyBuffer = _text;
             Debug.Log($"[{nameof(ShowInspectorSerializationToolAttribute)}] Copied to clipboard.");
@@ -72,15 +74,10 @@ namespace Hlight.Serialization.InspectorSerializationTool.Editor
 
         private void Deserialize(SerializedProperty property)
         {
-            var target = property.serializedObject.targetObject;
-            var value = _serializer
+            property.boxedValue = _serializer
                 ? _serializer.Deserialize(_text, fieldInfo.FieldType)
                 : JsonUtility.FromJson(_text, fieldInfo.FieldType);
-
-            Undo.RecordObject(target, "Deserialize Inspector Value");
-            fieldInfo.SetValue(target, value);
-            EditorUtility.SetDirty(target);
-            property.serializedObject.Update();
+            property.serializedObject.ApplyModifiedProperties();   // records Undo and marks dirty
         }
     }
 }
