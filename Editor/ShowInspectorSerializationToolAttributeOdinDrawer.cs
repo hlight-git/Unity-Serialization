@@ -1,4 +1,5 @@
 #if ODIN_INSPECTOR
+using System;
 using Hlight.Serialization.Serializer;
 using Sirenix.OdinInspector;
 using Sirenix.OdinInspector.Editor;
@@ -7,8 +8,10 @@ using UnityEngine;
 
 namespace Hlight.Serialization.InspectorSerializationTool.Editor
 {
+    // IDisposable: Odin disposes a drawer that implements it along with its property, which is the
+    // only point the tool's own PropertyTree can be released before the GC finds it and warns.
     public class ShowInspectorSerializationToolAttributeOdinDrawer<T>
-        : OdinAttributeDrawer<ShowInspectorSerializationToolAttribute, T>
+        : OdinAttributeDrawer<ShowInspectorSerializationToolAttribute, T>, IDisposable
     {
         private PropertyTree _propertyTree;
 
@@ -26,6 +29,12 @@ namespace Hlight.Serialization.InspectorSerializationTool.Editor
             EditorGUI.indentLevel++;
             _propertyTree.Draw(false);
             EditorGUI.indentLevel--;
+        }
+
+        public void Dispose()
+        {
+            _propertyTree?.Dispose();
+            _propertyTree = null;
         }
 
         private class Tool
